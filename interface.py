@@ -103,10 +103,56 @@ class Gui:
     Handles clicks to the solve label. Calls Kmap16 for the creation, simplification,
     and returning of input data in string form. Sets result label to simplified
     equation
+    
+    Params: event
     """
     def handle_click_solve(self, event):
-        caller = event.widget
         kmap = Kmap16()
-        kmap.K = self.k
+        kmap.K = self.set_inputs(self.inputs)
         kmap.start()
-        self.results["text"] = kmap.simplify_equations(kmap.create_equations_from_boxes(kmap.create_boxes()))
+        unfiltered = kmap.simplify_equations(kmap.create_equations_from_boxes(kmap.create_boxes()))
+        self.results["text"] = self.filter_results(unfiltered, self.inputs)
+        
+    """
+    Helper function for handle_click_solve, configures kmap.K to match inputs
+    
+    Params: int
+    
+    Returns: 2D array
+    """
+    def set_inputs(self, inputs):
+        
+        newArray = copy.deepcopy(self.k)
+        
+        if inputs == 3:
+            newArray = copy.deepcopy(self.k)
+            newArray[2] = [0,0,0,0]
+            newArray[3] = [0,0,0,0]
+        elif inputs == 2:
+            newArray = copy.deepcopy(self.k)
+            newArray[1] = [0,0,0,0]
+            newArray[2] = [0,0,0,0]
+            newArray[3] = [0,0,0,0]
+        
+        return newArray
+        
+    """
+    Helper function for handle_click_solve, formats the results to match the
+    current configuration
+    
+    Params: string, int
+    
+    Returns: string
+    """
+    def filter_results(self, unfiltered, inputs):
+        newString = unfiltered
+        if inputs == 3:
+            a = unfiltered.replace("A", "")
+            newString = a.replace("a", "")
+        elif inputs == 2:
+            a = unfiltered.replace("A", "")
+            b = a.replace("a", "")
+            c = b.replace("B", "")
+            newString = c.replace("b", "")
+        
+        return newString
